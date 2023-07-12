@@ -97,7 +97,7 @@ export default class Parser {
       value: this.parseExpr(),
     } as VarDecl;
 
-    this.expect(TokenType.Pipe, "Expected Pipe after variable declaration.");
+    //this.expect(TokenType.Pipe, "Expected Pipe after variable declaration.");
     return decl;
   }
 
