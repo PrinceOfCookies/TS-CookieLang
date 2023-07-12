@@ -1,10 +1,18 @@
 // deno-lint-ignore-file no-empty-interface
 export type NodeType =
-  | "Program" // 1
-  | "VarDecl" // 2
-  | "NumberLit" // 3
-  | "Identifier" // 4
-  | "BinaryExpr"; // 5
+  // State
+  | "Program"
+  | "VarDecl"
+
+  // Expr
+  | "AssignmentExpr"
+
+  // Lit
+  | "Property"
+  | "ObjectLit"
+  | "Identifier" 
+  | "NumberLit"
+  | "BinaryExpr";
 
 // Doesn't return a value
 export interface State {
@@ -18,13 +26,19 @@ export interface Program extends State {
 
 export interface VarDecl extends State {
   kind: "VarDecl";
-  constant: boolean,
-  id: string,
+  constant: boolean;
+  id: string;
   value?: Expr;
 }
 
 // Does return a value
 export interface Expr extends State {}
+
+export interface AssignmentExpr extends Expr {
+  kind: "AssignmentExpr";
+  assigne: Expr;
+  value: Expr;
+}
 
 export interface BinaryExpr extends Expr {
   kind: "BinaryExpr";
@@ -41,4 +55,15 @@ export interface Identifier extends Expr {
 export interface NumberLit extends Expr {
   kind: "NumberLit";
   value: number;
+}
+
+export interface Property extends Expr {
+  kind: "Property";
+  key: string;
+  value?: Expr;
+}
+
+export interface ObjectLit extends Expr {
+  kind: "ObjectLit";
+  properties: Property[];
 }

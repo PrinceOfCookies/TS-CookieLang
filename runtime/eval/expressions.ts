@@ -1,4 +1,4 @@
-import { BinaryExpr, Identifier } from "../../frontend/ast.ts";
+import { AssignmentExpr, BinaryExpr, Identifier } from "../../frontend/ast.ts";
 import Env from "../env.ts";
 import { C_eval } from "../interp.ts";
 import { MK_NULL, NumberValue, RunTimeValue } from "../values.ts";
@@ -54,4 +54,16 @@ export function C_evalBinaryExpr(BinOp: BinaryExpr, env: Env): RunTimeValue {
 export function C_evalIdentifier(id: Identifier, env: Env): RunTimeValue {
   const val = env.getVar(id.name);
   return val;
+}
+
+export function C_evalAssignmentExpr(
+  node: AssignmentExpr,
+  env: Env
+): RunTimeValue {
+  if (node.assigne.kind != "Identifier")
+    throw `Cannot assign to non-identifier: ${node.assigne}`;
+
+  const varName = (node.assigne as Identifier).name;
+
+  return env.assignVar(varName, C_eval(node.value, env));
 }

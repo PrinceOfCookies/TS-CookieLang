@@ -7,6 +7,9 @@ import {
   Identifier,
   NumberLit,
   VarDecl,
+  AssignmentExpr,
+  Property,
+  ObjectLit,
 } from "./ast.ts";
 import { Tokenize, Token, TokenType } from "./lexer.ts";
 
@@ -102,7 +105,76 @@ export default class Parser {
   }
 
   private parseExpr(): Expr {
-    return this.parseAddExpr();
+    return this.parseAssignExpr();
+  }
+
+  private parseAssignExpr(): Expr {
+    const left = this.parseObjExpr();
+
+    if (this.at().type == TokenType.Equals) {
+      this.adv(); // adv past equals
+      const value = this.parseAssignExpr();
+      return {
+        kind: "AssignmentExpr",
+        assigne: left,
+        value,
+      } as AssignmentExpr;
+    }
+
+    return left;
+  }
+
+  private parseObjExpr(): Expr {
+    // { Prop[] }
+
+    if (this.at().type != TokenType.OpenBrace) {
+      return this.parseAddExpr();
+    }
+
+    this.adv(); // adv past open brace
+    const properties = new Array<Property>();
+
+    while (this.notEOF() && this.at().type != TokenType.CloseBrace) {
+      //  { key : value, key2: val }
+      // { key }
+
+      const key = this.expect(
+        TokenType.Identifier,
+        "Unexpected token found inside object literal. Expected identifier."
+      ).value;
+
+      // Allows for { key } and { key, key2 }
+      if (this.at().type == TokenType.Comma) {
+        this.adv(); // Adv past the command
+        properties.push({ kind: "Property", key } as Property);
+        continue;
+      } // Allows shothand key: { key }
+      else if (this.at().type == TokenType.CloseBrace) {
+        properties.push({ kind: "Property", key });
+        break;
+      }
+
+      // Allows for { key: value }
+      this.expect(
+        TokenType.Colon,
+        "Expected colon following key in object literal."
+      );
+      const value = this.parseExpr();
+
+      properties.push({ kind: "Property", key, value } as Property);
+      if (this.at().type != TokenType.CloseBrace)
+        this.expect(
+          TokenType.Comma,
+          "Expect comma or closing brace following property in object literal"
+        );
+
+    }
+
+    this.expect(
+      TokenType.CloseBrace,
+      "Unexpected token found inside object literal. Expected closing brace."
+    ); // adv past close brace
+    return { kind: "ObjectLit", properties } as ObjectLit;
   }
 
   private parseAddExpr(): Expr {
