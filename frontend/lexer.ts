@@ -46,7 +46,7 @@ function isDigit(c: string): boolean {
 }
 
 function canSkip(c: string): boolean {
-  return c == " " || c == "\n" || c == "\t";
+  return c == " " || c == "\n" || c == "\t" || c == "\r";
 }
 
 export function Tokenize(srcCode: string): Token[] {
@@ -106,7 +106,7 @@ export function Tokenize(srcCode: string): Token[] {
       } else if (canSkip(src[0])) {
         src.shift();
       } else {
-        console.log(`Unexpected token ${src[0]}`);
+        console.log(`Unexpected token: ${src[0]}`);
         Deno.exit(1);
       }
     }

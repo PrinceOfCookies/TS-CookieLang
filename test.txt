@@ -1,13 +1,12 @@
 let foo = 50 / 2
 
-const obj = {
+const obj = [
   x: 100,
   y: 32,
   foo: foo,
-  complex: {
+  complex: [
     bar: true,
-  },
-}
+  ],
+]
 
-let f = object.complex.bar
-foo = obj.foo + 5
+let f = obj

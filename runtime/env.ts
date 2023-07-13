@@ -1,9 +1,9 @@
-import { MK_NULL, RunTimeValue } from "./values.ts";
+import { MK_BOOL, MK_NULL, RunTimeValue } from "./values.ts";
 
 function setupEnv(env: Env) {
   env.declareVar("null", MK_NULL(), true);
-  env.declareVar("true", MK_TRUE(), true);
-  env.declareVar("false", MK_FALSE(), true);
+  env.declareVar("true", MK_BOOL(true), true);
+  env.declareVar("false", MK_BOOL(false), true);
 }
 
 export default class Env {
@@ -62,12 +62,4 @@ export default class Env {
 
     return this.parent.resolve(name);
   }
-}
-
-function MK_TRUE(): RunTimeValue {
-  throw new Error("Function not implemented.");
-}
-
-function MK_FALSE(): RunTimeValue {
-  throw new Error("Function not implemented.");
 }

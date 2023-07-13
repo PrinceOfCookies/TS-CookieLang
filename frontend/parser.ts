@@ -73,7 +73,9 @@ export default class Parser {
     const constant = this.adv().type == TokenType.const;
     const id = this.expect(
       TokenType.Identifier,
-      "Expected identifier following variable declaration."
+      `Expected identifier following variable declaration. Found: ${
+        this.at().value
+      }`
     ).value;
 
     if (this.at().type == TokenType.Pipe) {
@@ -90,7 +92,7 @@ export default class Parser {
 
     this.expect(
       TokenType.Equals,
-      "Expected equals sign in variable declaration."
+      `Expected equals sign in variable declaration. Found: ${this.at().value}`
     );
 
     const decl = {
@@ -140,7 +142,9 @@ export default class Parser {
 
       const key = this.expect(
         TokenType.Identifier,
-        "Unexpected token found inside object literal. Expected identifier."
+        `Unexpected token found inside object. Expected identifier. Found: ${
+          this.at().value
+        }`
       ).value;
 
       // Allows for { key } and { key, key2 }
@@ -157,7 +161,7 @@ export default class Parser {
       // Allows for { key: value }
       this.expect(
         TokenType.Colon,
-        "Expected colon following key in object literal."
+        `Expected colon following key in object. Found: ${this.at().value}`
       );
       const value = this.parseExpr();
 
@@ -165,14 +169,17 @@ export default class Parser {
       if (this.at().type != TokenType.CloseBrace)
         this.expect(
           TokenType.Comma,
-          "Expect comma or closing brace following property in object literal"
+          `Expected comma, or closing brace following property in object. Found: ${
+            this.at().value
+          } `
         );
-
     }
 
     this.expect(
       TokenType.CloseBrace,
-      "Unexpected token found inside object literal. Expected closing brace."
+      `Unexpected token found inside object literal. Expected closing brace. Found ${
+        this.at().value
+      }`
     ); // adv past close brace
     return { kind: "ObjectLit", properties } as ObjectLit;
   }
@@ -243,7 +250,9 @@ export default class Parser {
         const expr = this.parseExpr();
         this.expect(
           TokenType.CloseParen,
-          "Unexpected token found inside parenthesised expression. Expected closing parenthesis."
+          `Unexpected token found inside parenthesised expression. Expected closing parenthesis. Found: ${
+            this.at().value
+          }`
         ); // Adv past the close paren
         return expr;
       }

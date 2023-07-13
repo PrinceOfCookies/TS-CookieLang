@@ -10,7 +10,7 @@ export type NodeType =
   // Lit
   | "Property"
   | "ObjectLit"
-  | "Identifier" 
+  | "Identifier"
   | "NumberLit"
   | "BinaryExpr";
 
