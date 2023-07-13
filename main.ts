@@ -1,12 +1,12 @@
 // deno-lint-ignore-file no-unused-vars
 import Parser from "./frontend/parser.ts";
-import Env from "./runtime/env.ts";
+import Env, { createEnv_G } from "./runtime/env.ts";
 import { C_eval } from "./runtime/interp.ts";
 run("./test.txt")
 
 async function run(filename: string) {
   const parser = new Parser();
-  const env = new Env();
+  const env = createEnv_G();
 
   const input = await Deno.readTextFile(filename);
   const ast = parser.produceAST(input);
@@ -17,7 +17,7 @@ async function run(filename: string) {
 
 function repl() {
   const parser = new Parser();
-  const env = new Env();
+  const env = createEnv_G();
 
   console.log("\nRepl v0.0.1");
   while (true) {

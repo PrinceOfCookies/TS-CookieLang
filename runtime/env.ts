@@ -1,9 +1,12 @@
 import { MK_BOOL, MK_NULL, RunTimeValue } from "./values.ts";
 
-function setupEnv(env: Env) {
-  env.declareVar("null", MK_NULL(), true);
+export function createEnv_G() {
+  const env = new Env();
   env.declareVar("true", MK_BOOL(true), true);
   env.declareVar("false", MK_BOOL(false), true);
+  env.declareVar("null", MK_NULL(), true);
+
+  return env;
 }
 
 export default class Env {
@@ -12,14 +15,10 @@ export default class Env {
   private constants: Set<string>;
 
   constructor(parentEnv?: Env) {
-    const globalEnv = parentEnv ? true : false;
+    // const globalEnv = parentEnv ? true : false;
     this.parent = parentEnv;
     this.vars = new Map();
     this.constants = new Set();
-
-    if (globalEnv) {
-      setupEnv(this);
-    }
   }
 
   public declareVar(

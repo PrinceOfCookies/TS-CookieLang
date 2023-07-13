@@ -1,12 +1,10 @@
-let foo = 50 / 2
+const foo = 45 / 2
 
-const obj = [
+const obj = {
   x: 100,
   y: 32,
-  foo: foo,
-  complex: [
+  foo,
+  complex: {
     bar: true,
-  ],
-]
-
-let f = obj
+  },
+}

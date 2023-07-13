@@ -15,8 +15,8 @@ export enum TokenType {
   CloseParen, // )
   Comma, // ,
   Colon, // :
-  OpenBrace, // [
-  CloseBrace, // ]
+  OpenBrace, // {
+  CloseBrace, // }
   BinaryOperator, // +, -, *, /
   EOF, // End of file
 }
@@ -58,9 +58,9 @@ export function Tokenize(srcCode: string): Token[] {
       Tokens.push(Token(src.shift(), TokenType.OpenParen));
     } else if (src[0] == ")") {
       Tokens.push(Token(src.shift(), TokenType.CloseParen));
-    } else if (src[0] == "[") {
+    } else if (src[0] == "{") {
       Tokens.push(Token(src.shift(), TokenType.OpenBrace));
-    } else if (src[0] == "]") {
+    } else if (src[0] == "}") {
       Tokens.push(Token(src.shift(), TokenType.CloseBrace));
     } else if (
       src[0] == "+" ||
