@@ -10,6 +10,8 @@ import {
   AssignmentExpr,
   Property,
   ObjectLit,
+  CallExpr,
+  MemberExpr,
 } from "./ast.ts";
 import { Tokenize, Token, TokenType } from "./lexer.ts";
 
@@ -102,13 +104,20 @@ export default class Parser {
       value: this.parseExpr(),
     } as VarDecl;
 
-    //this.expect(TokenType.Pipe, "Expected Pipe after variable declaration.");
     return decl;
   }
 
   private parseExpr(): Expr {
     return this.parseAssignExpr();
   }
+
+  // ****** Order of Precedence ******
+  // 1. AssignExpr
+  // 2. AddExpr
+  // 3. MultiExpr
+  // 4. CallExpr
+  // 5. MemberExpr
+  // 6. PrimaryExpr
 
   private parseAssignExpr(): Expr {
     const left = this.parseObjExpr();
@@ -202,7 +211,7 @@ export default class Parser {
   }
 
   private parseMultiExpr(): Expr {
-    let left = this.parsePrimaryExpr();
+    let left = this.parseCallMemberExpr();
 
     while (
       this.at().value == "/" ||
@@ -210,7 +219,7 @@ export default class Parser {
       this.at().value == "%"
     ) {
       const operator = this.adv().value;
-      const right = this.parsePrimaryExpr();
+      const right = this.parseCallMemberExpr();
       left = {
         kind: "BinaryExpr",
         left,
@@ -222,15 +231,104 @@ export default class Parser {
     return left;
   }
 
-  // AssignExpr (Assign)
-  // MemberExpr (Dot, Index)
-  // FuncCall (CallExpr)
-  // LogicExpr (And, Or)
-  // CompExpr (Eq, Neq, Lt, Gt, Lte, Gte)
-  // AddExpr (Add, Sub)
-  // MultiExpr (Mul, Div, Mod)
-  // UnaryExpr (Not, Neg)
-  // PrimaryExpr (NumberLit, Identifier, ParenExpr)
+  // foo.x()()
+  private parseCallMemberExpr(): Expr {
+    const member = this.parseMemberExpr();
+
+    if (this.at().type == TokenType.OpenParen) {
+      return this.parseCallExpr(member);
+    }
+
+    return member;
+  }
+
+  private parseCallExpr(callee: Expr): Expr {
+    let callExpr: Expr = {
+      kind: "CallExpr",
+      args: this.parseArgs(),
+      callee,
+    } as CallExpr;
+
+    if (this.at().type == TokenType.OpenParen) {
+      callExpr = this.parseCallExpr(callExpr);
+    }
+
+    return callExpr;
+  }
+
+  // Args (x + 5, foo()) ~= Params (x = 1, y = 2)
+  private parseArgs(): Expr[] {
+    // Should never be called, but just in case..
+    this.expect(
+      TokenType.OpenParen,
+      `Expected open parenthesis. Found: ${this.at().value} instead.`
+    );
+
+    const args =
+      this.at().type == TokenType.CloseParen ? [] : this.parseArgsList();
+
+    this.expect(
+      TokenType.CloseParen,
+      `Expected closing parenthesis. Found: ${this.at().value} instead.`
+    );
+
+    return args;
+  }
+
+  private parseArgsList(): Expr[] {
+    const args = [this.parseExpr()];
+
+    while (this.at().type == TokenType.Comma && this.adv()) {
+      args.push(this.parseExpr());
+    }
+
+    return args;
+  }
+
+  private parseMemberExpr(): Expr {
+    let obj = this.parsePrimaryExpr();
+
+    while (
+      this.at().type == TokenType.Dot ||
+      this.at().type == TokenType.OpenBracket
+    ) {
+      const op = this.adv();
+
+      let prop: Expr;
+      let computed: boolean;
+
+      // Non-computed property (obj.expr)
+      if (op.type == TokenType.Dot) {
+        computed = false;
+
+        // Get the Identifier
+        prop = this.parsePrimaryExpr();
+
+        if (prop.kind != "Identifier")
+          throw `Unexpected token found. Expected identifier. Found: ${prop.kind} instead.`;
+      } else {
+        // Allows for computed properties (obj[expr])
+        computed = true;
+
+        // Get the Expression
+        prop = this.parseExpr();
+
+        this.expect(
+          TokenType.CloseBracket,
+          `Expected closing bracket. Found: ${this.at().value} instead.`
+        );
+      }
+
+      obj = {
+        kind: "MemberExpr",
+        obj,
+        prop,
+        computed,
+      } as MemberExpr;
+    }
+
+    return obj;
+  }
 
   private parsePrimaryExpr(): Expr {
     const tk = this.at().type;

@@ -3,6 +3,8 @@ export enum TokenType {
   Number, // 1, 2, 3, 4, 5, 6, 7, 8, 9, 0
   Identifier, // Variable name
   String, // "String"
+  SemiColon, // ;
+  Pipe, // |
 
   //* Keyword tokens *//
   Let, // let
@@ -10,13 +12,15 @@ export enum TokenType {
 
   //* Operator tokens *//
   Equals, // =
-  Pipe, // |
   OpenParen, // (
   CloseParen, // )
   Comma, // ,
+  Dot, // .
   Colon, // :
   OpenBrace, // {
   CloseBrace, // }
+  OpenBracket, // [
+  CloseBracket, // ]
   BinaryOperator, // +, -, *, /
   EOF, // End of file
 }
@@ -62,6 +66,10 @@ export function Tokenize(srcCode: string): Token[] {
       Tokens.push(Token(src.shift(), TokenType.OpenBrace));
     } else if (src[0] == "}") {
       Tokens.push(Token(src.shift(), TokenType.CloseBrace));
+    } else if (src[0] == "[") {
+      Tokens.push(Token(src.shift(), TokenType.OpenBracket));
+    } else if (src[0] == "]") {
+      Tokens.push(Token(src.shift(), TokenType.CloseBracket));
     } else if (
       src[0] == "+" ||
       src[0] == "-" ||
@@ -76,8 +84,12 @@ export function Tokenize(srcCode: string): Token[] {
       Tokens.push(Token(src.shift(), TokenType.Pipe));
     } else if (src[0] == ":") {
       Tokens.push(Token(src.shift(), TokenType.Colon));
+    } else if (src[0] == ";") {
+      Tokens.push(Token(src.shift(), TokenType.SemiColon));
     } else if (src[0] == ",") {
       Tokens.push(Token(src.shift(), TokenType.Comma));
+    } else if (src[0] == '.') {
+      Tokens.push(Token(src.shift(), TokenType.Dot));
     } else {
       // Handle multi-char tokens
       if (isDigit(src[0])) {

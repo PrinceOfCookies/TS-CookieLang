@@ -6,6 +6,8 @@ export type NodeType =
 
   // Expr
   | "AssignmentExpr"
+  | "MemberExpr"
+  | "CallExpr"
 
   // Lit
   | "Property"
@@ -45,6 +47,22 @@ export interface BinaryExpr extends Expr {
   left: Expr;
   right: Expr;
   operator: string;
+}
+
+//* These are the same *\\
+// foo.bar()
+// foo[bar]()
+export interface CallExpr extends Expr {
+  kind: "CallExpr";
+  args: Expr[];
+  callee: Expr;
+}
+
+export interface MemberExpr extends Expr {
+  kind: "MemberExpr";
+  obj: Expr;
+  prop: Expr;
+  computed: boolean;
 }
 
 export interface Identifier extends Expr {

@@ -8,3 +8,5 @@ const obj = {
     bar: true,
   },
 }
+
+foo = obj.foo(bar(x, y)) + 5
