@@ -1,4 +1,3 @@
-// deno-lint-ignore-file no-fallthrough
 import {
   State,
   Program,
@@ -7,6 +6,7 @@ import {
   Identifier,
   NumberLit,
   VarDecl,
+  FuncDecl,
   AssignmentExpr,
   Property,
   ObjectLit,
@@ -61,9 +61,10 @@ export default class Parser {
     // Skip to parseExpr
     switch (this.at().type) {
       case TokenType.Let:
-
       case TokenType.const:
         return this.parseVarDecl();
+      case TokenType.Func:
+        return this.parseFuncDecl();
 
       default:
         return this.parseExpr();
@@ -105,6 +106,67 @@ export default class Parser {
     } as VarDecl;
 
     return decl;
+  }
+
+  parseFuncDecl(): State {
+    // Check for async keyword before func keyword
+    let global = false;
+    // deno-lint-ignore prefer-const
+    let async = false;
+
+    //if (this.at().type == TokenType.Async) {
+    //  async = true;
+    //  this.adv(); // Adv past async
+    //}
+
+    this.adv(); // Adv past Func
+
+    const name = this.expect(
+      TokenType.Identifier,
+      `Expected identifier following function declaration. Found: ${
+        (this.at().value)
+      } instead.`
+    ).value;
+
+    // Check if there is a captial G at the end of the name
+    if (name[name.length - 1] == "G")
+      global = true;
+        
+    // Reads comma seperated arguments between parenthesis
+    const args = this.parseArgs();
+
+    // Make sure they are all strings
+    const params: string[] = [];
+
+    for (const arg of args) {
+      if (arg.kind != "Identifier") {
+        console.log(arg);
+        throw `Unexpected parameter types found. Expected type identifier. Found: ${arg.kind} instead.`;
+      }
+
+      params.push((arg as Identifier).name);
+    }
+
+    this.expect(TokenType.OpenBrace, `Expected opening brace. Found: ${this.at().value} instead.`);
+
+    const body: State[] = [];
+    
+    while (this.notEOF() && this.at().type != TokenType.CloseBrace) { 
+      body.push(this.parseState());
+    }
+
+    this.expect(TokenType.CloseBrace, `Expected closing brace. Found: ${this.at().value} instead.`);
+
+    const Func = {
+      kind: "FuncDecl",
+      name,
+      params,
+      body,
+      async,
+      global,
+    } as FuncDecl;
+
+    return Func
   }
 
   private parseExpr(): Expr {

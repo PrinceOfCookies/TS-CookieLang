@@ -9,6 +9,8 @@ export enum TokenType {
   //* Keyword tokens *//
   Let, // let
   const, // const
+  Func, // func
+  Async, // async
 
   //* Operator tokens *//
   Equals, // =
@@ -28,6 +30,8 @@ export enum TokenType {
 const KEYWORDS: Record<string, TokenType> = {
   let: TokenType.Let,
   const: TokenType.const,
+  func: TokenType.Func,
+  async: TokenType.Async,
 };
 
 export interface Token {

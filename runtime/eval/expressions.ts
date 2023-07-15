@@ -1,12 +1,20 @@
 import {
   AssignmentExpr,
   BinaryExpr,
+  CallExpr,
   Identifier,
   ObjectLit,
 } from "../../frontend/ast.ts";
 import Env from "../env.ts";
 import { C_eval } from "../interp.ts";
-import { MK_NULL, NumberValue, ObjectValue, RunTimeValue } from "../values.ts";
+import {
+FunctionValue,
+  MK_NULL,
+  NativeFuncValue,
+  NumberValue,
+  ObjectValue,
+  RunTimeValue,
+} from "../values.ts";
 
 function C_evalNumBinExpr(
   leftside: NumberValue,
@@ -82,7 +90,44 @@ export function C_evalObjExpr(obj: ObjectLit, env: Env): RunTimeValue {
       value == undefined ? env.getVar(key) : C_eval(value, env);
 
     object.properties.set(key, runtimeVal);
+
   }
 
   return object;
+}
+
+export function C_evalCallExpr(Expr: CallExpr, env: Env): RunTimeValue {
+  const args = Expr.args.map((arg) => C_eval(arg, env));
+
+  if (Expr.callee.kind != "Identifier")
+    throw `Cannot call non-identifier: ${Expr.callee}`;
+
+  const funcName = C_eval(Expr.callee, env);
+
+  if (funcName.type == "nativefunction") {
+    const result = (funcName as NativeFuncValue).call(args, env);
+    return result;
+  } 
+  
+  if (funcName.type == "function") {
+    const func = funcName as FunctionValue;
+    const scope = new Env(func.declEnv);
+
+    // Create the variables for the params list
+    for (let i = 0; i < func.params.length; i++) {
+      const FuncName = func.params[i];
+      const FuncVal = func.params[i] ? args[i] : MK_NULL();
+      scope.declareVar(FuncName, FuncVal, false);
+    }
+
+    let result: RunTimeValue = MK_NULL();
+
+    for (const statement of func.body) {
+      result = C_eval(statement, scope);
+    }
+
+    return result;
+  }
+
+  throw `Cannot call non-function: ${JSON.stringify(funcName)}`;
 }

@@ -2,6 +2,8 @@ import { RunTimeValue, NumberValue } from "./values.ts";
 import {
   AssignmentExpr,
   BinaryExpr,
+  CallExpr,
+  FuncDecl,
   Identifier,
   NumberLit,
   ObjectLit,
@@ -13,10 +15,11 @@ import Env from "./env.ts";
 import {
   C_evalAssignmentExpr,
   C_evalBinaryExpr,
+  C_evalCallExpr,
   C_evalIdentifier,
 C_evalObjExpr,
 } from "./eval/expressions.ts";
-import { C_evalProgram, C_evalVarDecl } from "./eval/statements.ts";
+import { C_evalFuncDecl, C_evalProgram, C_evalVarDecl } from "./eval/statements.ts";
 
 export function C_eval(astNode: State, env: Env): RunTimeValue {
   switch (astNode.kind) {
@@ -29,6 +32,8 @@ export function C_eval(astNode: State, env: Env): RunTimeValue {
       return C_evalIdentifier(astNode as Identifier, env);
     case "ObjectLit":
       return C_evalObjExpr(astNode as ObjectLit, env);
+    case "CallExpr":
+      return C_evalCallExpr(astNode as CallExpr, env);
     case "BinaryExpr":
       return C_evalBinaryExpr(astNode as BinaryExpr, env);
     case "AssignmentExpr":
@@ -39,6 +44,8 @@ export function C_eval(astNode: State, env: Env): RunTimeValue {
     // handle statements
     case "VarDecl":
       return C_evalVarDecl(astNode as VarDecl, env);
+    case "FuncDecl":
+      return C_evalFuncDecl(astNode as FuncDecl, env);
 
     default:
       console.error("Unknown AST Node: ", astNode);

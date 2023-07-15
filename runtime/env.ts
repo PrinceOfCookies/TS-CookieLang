@@ -1,10 +1,24 @@
-import { MK_BOOL, MK_NULL, RunTimeValue } from "./values.ts";
+import { MK_BOOL, MK_NATIVE_FUNC, MK_NULL, MK_NUM, RunTimeValue } from "./values.ts";
 
 export function createEnv_G() {
   const env = new Env();
+  // Create default global environment
   env.declareVar("true", MK_BOOL(true), true);
   env.declareVar("false", MK_BOOL(false), true);
   env.declareVar("null", MK_NULL(), true);
+
+  // Define a native method
+  env.declareVar("print", MK_NATIVE_FUNC((args) => {
+      console.log(...args);
+      return MK_NULL();
+    }), true);
+  env.declareVar("log", env.getVar("print"), true)
+
+  function timeFunc(_args: RunTimeValue[], _env: Env) {
+    return MK_NUM(Date.now());
+  }
+
+  env.declareVar("curTime", MK_NATIVE_FUNC((timeFunc)), true);
 
   return env;
 }

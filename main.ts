@@ -12,7 +12,7 @@ async function run(filename: string) {
   const ast = parser.produceAST(input);
 
   const result = C_eval(ast, env);
-  console.log(result);
+  //console.log(result);
 }
 
 function repl() {
@@ -29,6 +29,6 @@ function repl() {
 
     const ast = parser.produceAST(input);
     const result = C_eval(ast, env);
-    console.log(result);
+    //console.log(result);
   }
 }

@@ -1,12 +1,10 @@
-const foo = 45 / 2
+func betterAdd (offset) {
+  func add (x, y) {
+    x + y + offset
+  }
 
-const obj = {
-  x: 100,
-  y: 32,
-  foo,
-  complex: {
-    bar: true,
-  },
+  add
 }
 
-foo = obj.foo(bar(x, y)) + 5
+const adder = betterAdd(10)
+print(adder(1, 2))

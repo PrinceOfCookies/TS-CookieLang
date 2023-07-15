@@ -1,4 +1,6 @@
-export type ValueType = "null" | "number" | "boolean" | "object";
+import { State } from "../frontend/ast.ts";
+import Env from "./env.ts";
+export type ValueType = "null" | "number" | "boolean" | "object" | "nativefunction" | "function";
 
 export interface RunTimeValue {
   type: ValueType;
@@ -34,4 +36,24 @@ export function MK_NUM(n = 0): NumberValue {
 export interface ObjectValue extends RunTimeValue {
   type: "object";
   properties: Map<string, RunTimeValue>;
+}
+
+export type FunctionCall = (args: RunTimeValue[], env: Env) => RunTimeValue;
+export interface NativeFuncValue extends RunTimeValue {
+  type: "nativefunction";
+  call: FunctionCall;
+}
+
+export function MK_NATIVE_FUNC(call: FunctionCall): NativeFuncValue {
+  return { type: "nativefunction", call } as NativeFuncValue;
+}
+
+export interface FunctionValue extends RunTimeValue {
+  type: "function";
+  name: string;
+  params: string[];
+  declEnv: Env;
+  body: State[];
+  async: boolean;
+  global: boolean;
 }

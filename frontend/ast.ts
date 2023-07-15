@@ -3,6 +3,7 @@ export type NodeType =
   // State
   | "Program"
   | "VarDecl"
+  | "FuncDecl"
 
   // Expr
   | "AssignmentExpr"
@@ -31,6 +32,15 @@ export interface VarDecl extends State {
   constant: boolean;
   id: string;
   value?: Expr;
+}
+
+export interface FuncDecl extends State {
+  kind: "FuncDecl";
+  name: string;
+  params: string[]
+  body: State[];
+  async: boolean;
+  global: boolean;
 }
 
 // Does return a value
