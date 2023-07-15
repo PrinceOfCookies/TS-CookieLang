@@ -1,6 +1,6 @@
 import { State } from "../frontend/ast.ts";
 import Env from "./env.ts";
-export type ValueType = "null" | "number" | "boolean" | "object" | "nativefunction" | "function";
+export type ValueType = "null" | "number" | "boolean" | "object" | "nativefunction" | "function" | "string";
 
 export interface RunTimeValue {
   type: ValueType;
@@ -56,4 +56,13 @@ export interface FunctionValue extends RunTimeValue {
   body: State[];
   async: boolean;
   global: boolean;
+}
+
+export interface StringValue extends RunTimeValue {
+  type: "string";
+  value: string;
+}
+
+export function MK_STR(s = ""): StringValue {
+  return { type: "string", value: s } as StringValue;
 }

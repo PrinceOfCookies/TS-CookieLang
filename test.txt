@@ -1,10 +1,1 @@
-func betterAdd (offset) {
-  func add (x, y) {
-    x + y + offset
-  }
-
-  add
-}
-
-const adder = betterAdd(10)
-print(adder(1, 2))
+print("test")

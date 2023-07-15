@@ -2,8 +2,8 @@
 import Parser from "./frontend/parser.ts";
 import Env, { createEnv_G } from "./runtime/env.ts";
 import { C_eval } from "./runtime/interp.ts";
-run("./test.txt")
-
+//run("./test.txt")
+repl()
 async function run(filename: string) {
   const parser = new Parser();
   const env = createEnv_G();

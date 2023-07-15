@@ -15,6 +15,7 @@ export type NodeType =
   | "ObjectLit"
   | "Identifier"
   | "NumberLit"
+  | "StringLit"
   | "BinaryExpr";
 
 // Doesn't return a value
@@ -94,4 +95,9 @@ export interface Property extends Expr {
 export interface ObjectLit extends Expr {
   kind: "ObjectLit";
   properties: Property[];
+}
+
+export interface StringLit extends Expr {
+  kind: "StringLit";
+  value: string;
 }

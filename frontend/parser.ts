@@ -12,6 +12,7 @@ import {
   ObjectLit,
   CallExpr,
   MemberExpr,
+  StringLit
 } from "./ast.ts";
 import { Tokenize, Token, TokenType } from "./lexer.ts";
 
@@ -169,6 +170,7 @@ export default class Parser {
     return Func
   }
 
+
   private parseExpr(): Expr {
     return this.parseAssignExpr();
   }
@@ -177,6 +179,7 @@ export default class Parser {
   // 1. AssignExpr
   // 2. AddExpr
   // 3. MultiExpr
+  // 4. StringExpr
   // 4. CallExpr
   // 5. MemberExpr
   // 6. PrimaryExpr
@@ -255,6 +258,35 @@ export default class Parser {
     return { kind: "ObjectLit", properties } as ObjectLit;
   }
 
+  private parseStringExpr(): State {
+    let left = {
+      kind: "StringLit",
+      value: "",
+    } as StringLit;
+    // "string"
+    // 'string'
+    let text = ""
+    
+    if (this.at().type == TokenType.String) {
+      // Find all the text before the next TokenType.String
+      while (this.at().type != TokenType.String) {
+        text += this.adv().value;
+      }
+
+      this.adv(); // Adv past the string
+
+      left = {
+        kind: "StringLit",
+        value: text,
+      } as StringLit;
+    } 
+
+    return left;
+  }
+
+  
+  
+
   private parseAddExpr(): Expr {
     let left = this.parseMultiExpr();
 
@@ -303,6 +335,8 @@ export default class Parser {
 
     return member;
   }
+
+
 
   private parseCallExpr(callee: Expr): Expr {
     let callExpr: Expr = {
@@ -416,6 +450,9 @@ export default class Parser {
         ); // Adv past the close paren
         return expr;
       }
+
+      case TokenType.String:
+        return this.parseStringExpr();
 
       default:
         console.log(
