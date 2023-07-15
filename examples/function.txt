@@ -1,0 +1,6 @@
+func sum (x, y) {
+    let result = x + y
+
+    result
+}
+

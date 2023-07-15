@@ -1,0 +1,5 @@
+let foo = 55
+const bar = 52
+
+log(foo)
+print(bar)
